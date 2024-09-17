@@ -1,0 +1,44 @@
+#バーチャル環境
+venv/
+firstenv/
+ENV/
+.env/
+
+#エクセルファイル
+*.xlsx
+*.xls
+
+#ignore all log files
+*.log
+*.tmp
+
+#ignore all data files
+data/
+
+#ignore database file
+db.sqlite3
+
+#ignore python cache file
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+
+#ignore pyinstaller file
+*.spec
+
+#ignore IDE file
+.idea/
+
+#ignore editor file
+.vscode/
+.ipynb_checkpoints/
+.DS_Store
+.cursor/
+
+#ignore ssh file
+.ssh/
+
+
+

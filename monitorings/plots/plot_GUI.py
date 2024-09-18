@@ -10,6 +10,7 @@ import pivot_styler as ps
 def main():
     root = tk.Tk()
     root.withdraw()
+    
 
     while True:
         chosed_folder_path = filedialog.askdirectory(title= "フォルダを選択してください")

@@ -1,5 +1,8 @@
-株式会社○○
-稼働率描画ツール
+稼働率グラフツール
+Graphing Operations
+
+中村製作所
+Nakamura Mfg.
 
 
 

@@ -1,6 +1,14 @@
+import os
+import sys
+import time
+
 import flet as ft
 
-import config.settings as settings
+from monitorings.plots.config import settings
+from monitorings.plots import plot_timeline_csv
+from monitorings.plots import report_output_day_collector
+from monitorings.plots import plot_monthly_pivot
+from monitorings.plots import pivot_styler
 from views.console import get_template
 
 def main(page: ft.Page):

@@ -1,15 +1,21 @@
 import os
 import time
 import pandas as pd
-import openpyxl as opx
+import openpyxl as opxl
 import xlrd
 
+import config.settings as settings
+
+
+dir_path = settings.dir_path
+file_path = os.path.join(dir_path, "execution_time.txt")
+
 # 前回の実行時間を読み込む
-with open("C:\\Users\\nakamura114\\Desktop\\Report\\execution_time.txt", 'r') as file:
+with open(file_path, 'r') as file:
     last_execution_time = float(file.read().strip())
 
 # フォルダ内のファイルをリストアップ
-folder_path = "C:\\Users\\nakamura114\\Desktop\\Report\\"
+folder_path = dir_path
 files = os.listdir(folder_path)
 
 # 前回の実行時間以降に作成されたファイルをピックアップ
@@ -46,8 +52,8 @@ for file in new_files:
         # データを時系列データに変換
         
         #dfをエクセルファイルとして保存
-        df.to_excel(f"C:\\Users\\nakamura114\\Desktop\\Report\\{machine_name}_{date}.xlsx", index=False)
+        df.to_excel(os.path.join(dir_path, f"{machine_name}_{date}.xlsx"), index=False)
 
 # 現在の実行時間を保存
-with open("C:\\Users\\nakamura114\\Desktop\\Report\\execution_time.txt", 'w') as file:
+with open(file_path, 'w') as file:
     file.write(str(time.time()))

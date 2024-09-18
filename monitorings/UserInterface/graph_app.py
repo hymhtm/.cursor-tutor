@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import os
-from settings import user_settings
+from monitorings.UserInterface.config.settings import user_settings
 
 color_dict = user_settings['color_dict']
 equipment_orders = user_settings['equipment_orders']

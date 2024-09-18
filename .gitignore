@@ -40,5 +40,8 @@ __pycache__/
 #ignore ssh file
 .ssh/
 
-
+#ignore settings file
+monitorings/plots/config/settings.py
+monitorings/data_requests/config/settings.py
+monitorings/UserInterface/config/settings.py
 

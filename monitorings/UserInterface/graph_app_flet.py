@@ -1,7 +1,7 @@
 import flet as ft
 
 import config.settings as settings
-from views.console import get_template
+from monitorings.UserInterface.views.search_dirs import get_template
 
 def main(page: ft.Page):
     page.title = "稼働グラフ作成ツール"

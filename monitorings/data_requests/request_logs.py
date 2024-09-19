@@ -1,8 +1,6 @@
 import base64
 from datetime import datetime, timedelta, timezone
 import os
-
-import polars as pl
 import requests
 
 import config.settings as settings
@@ -11,6 +9,9 @@ class Requestlogs(object):
     
     def __init__(self, username:str=None, password:str=None, machine_groups:dict=None, monitorings:list=None,begin_datetime:datetime=None, end_datetime:datetime=None):
         #read default settings from settings.py
+        #url
+        self.base_condition_url = settings.base_condition_url
+        self.base_monitoring_url = settings.base_monitoring_url
         #認証情報
         self.user_settings = settings.user_settings
         self.default_username = self.user_settings['username']
@@ -47,8 +48,7 @@ class Requestlogs(object):
         for group, machines in machine_groups.items():
             for machine in machines:
                 #APIエンドポイント
-                url = f"http://192.168.11.210:3000/api/v1/equipment/{machine}/monitorings/condition/logs?from={begin_datetime}&to={end_datetime}"
-
+                url = self.base_condition_url.format(machine=machine, begin_datetime=begin_datetime, end_datetime=end_datetime)
                 #ユーザー名とパスワードをBASE64でエンコード
                 credentials = base64.base64encode(f"{self.username}:{self.password}".encode()).decode()
 
@@ -90,8 +90,8 @@ class Requestlogs(object):
         #モニタリンググループ
         monitorings = self.monitorings
         #データの取得期間
-        begin_datetime = self.begin_datetime
-        end_datetime = self.end_datetime
+        begin_datetime = self.begin_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end_datetime = self.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
         my_timezone = self.my_timezone
 
         #データを格納するリスト
@@ -103,8 +103,7 @@ class Requestlogs(object):
                 #モニタリンググループを繰り返し処理
                 for monitoring in monitorings:
                     #APIエンドポイント
-                    url = f"http:/192.168.11.210:3000/api/v1/equipment/{machine}/monitorings/{monitoring}/logs?from={begin_datetime}&to={end_datetime}"
-
+                    url = self.base_monitoring_url.format(machine=machine, monitoring=monitoring, begin_datetime=begin_datetime, end_datetime=end_datetime)
                     #ユーザー名とパスワードをbase64でエンコード
                     credentials = base64.base64encode(f"{self.username}:{self.password}".encode()).decode()
 
@@ -143,7 +142,7 @@ class Requestlogs(object):
     def save_logs(self, logs_list:list = None, specified_file_name:str=None, specified_folder_path:str=None):
         #ログリストが指定されていない場合はエラーメッセージを送信
         if logs_list is None:
-            raise ValueError("ログリストが指定されていません")
+            raise ValueError("logs_list is None")
         else:
             default_file_name = f"logs_{self.begin_datetime.strftime('%Y-%m-%d')}.csv"
             default_folder_path = "./logs"

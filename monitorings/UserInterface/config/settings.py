@@ -1,1 +1,4 @@
-dir_path = "C:\\Users\\nakamura114\\Desktop\\Report\\"
+DIR_PATH = None
+USER_PLOT_OPTION_DIR_PATH = None
+USER_SETTING_FILE_PATH = None
+USER_SETTING_FILE_NAME = None

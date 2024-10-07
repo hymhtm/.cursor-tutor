@@ -4,9 +4,9 @@ import string
 def get_template_dir_path():
     template_dir_path = None
     try:
-        import config.settings as settings
-        if settings.TEMPLATE_DIR_PATH:
-            template_dir_path = settings.TEMPLATE_DIR_PATH
+        import monitorings.UserInterface.config.default_settings as default_settings
+        if default_settings.TEMPLATE_DIR_PATH:
+            template_dir_path = default_settings.TEMPLATE_DIR_PATH
     except ImportError:
         pass
 
@@ -38,9 +38,9 @@ def get_template(template_file_name):
 def get_setting_dir_path():
     setting_dir_path = None
     try:
-        import config.settings as settings
-        if settings.SETTING_DIR_PATH:
-            setting_dir_path = settings.SETTING_DIR_PATH
+        import monitorings.UserInterface.config.default_settings as default_settings
+        if default_settings.SETTING_DIR_PATH:
+            setting_dir_path = default_settings.SETTING_DIR_PATH
     except ImportError:
         pass
 

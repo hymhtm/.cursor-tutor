@@ -15,9 +15,9 @@ def get_user_plot_option_dir_path():
     user_dir_path = None
 
     try:
-        import config.settings as settings
-        if settings.USER_PLOT_OPTION_DIR_PATH:
-            user_dir_path = settings.USER_PLOT_OPTION_DIR_PATH
+        import monitorings.UserInterface.config.default_settings as default_settings
+        if default_settings.USER_PLOT_OPTION_DIR_PATH:
+            user_dir_path = default_settings.USER_PLOT_OPTION_DIR_PATH
     except ImportError:
         pass
 

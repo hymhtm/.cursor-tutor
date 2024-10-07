@@ -1,6 +1,6 @@
 import flet as ft
 
-import config.settings as settings
+import monitorings.UserInterface.config.default_settings as default_settings
 from monitorings.UserInterface.views.search_dirs import get_template
 
 def main(page: ft.Page):
@@ -8,7 +8,7 @@ def main(page: ft.Page):
     greeting = get_template("top.txt")
     page.controls.append(ft.Text(value=greeting, color="blue"))
 
-    equipment = settings.equipment_dict
+    equipment = default_settings.equipment_dict
     
     for department, machine_list in equipment.items():
         page.controls.append(ft.Text(value=department, color="blue"))

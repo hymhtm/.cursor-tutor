@@ -8,7 +8,7 @@ from matplotlib import rcParams
 import matplotlib.patches as mpatches
 import pandas as pd
 
-import config.settings as settings
+from config import settings
 
 # 色の設定 全グラフ共通
 color_dict = settings.color_dict

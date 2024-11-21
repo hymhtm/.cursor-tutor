@@ -69,7 +69,6 @@ def plot_rate(folder_path):
     grouped.to_csv(os.path.join(folder_path, 'grouped_rate_data.csv'), index=False)
 
     # グラフを描画
-    """
     for name, group in grouped:
         fig, ax = plt.subplots(**subplot_kwargs)
         summary = group[['運転中', '停止中', 'アラーム中', '非常停止中', '手動運転中', '一時停止中', '切断中']].sum()
@@ -85,4 +84,3 @@ def plot_rate(folder_path):
             os.makedirs(save_dir)
         plt.savefig(os.path.join(save_dir, f'{date} - {name}.png'))
         plt.close()
-    """

@@ -3,7 +3,6 @@ import importlib.util
 import os
 import sys
 import time
-import threading
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -11,18 +10,7 @@ from matplotlib import rcParams
 import matplotlib.patches as mpatches
 import pandas as pd
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-
-def show_loading():
-    loading_root = tk.Tk()
-    loading_root.title("LOADING")
-    loading_root.geometry("200x100")
-    loading_label = tk.Label(loading_root, text="アプリを起動しています")
-    loading_label.pack(pady=20)
-    progress_bar = ttk.Progressbar(loading_root, orient="horizontal", length=100, mode="indeterminate")
-    progress_bar.pack(pady=10, padx=20, fill="x")
-    progress_bar.start(10)
-    loading_root.mainloop()
+from tkinter import filedialog, messagebox
 
 def resource_path(relative_path):
     try:
@@ -195,7 +183,5 @@ def main():
     root.destroy()
 
 if __name__ == '__main__':
-    loading_thread = threading.Thread(target=show_loading)
-    loading_thread.start()
     main()
-    loading_thread.join()
+    

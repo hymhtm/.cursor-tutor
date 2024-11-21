@@ -1,7 +1,6 @@
 import os
 import openpyxl
 from pandas import pivot_table
-from config import settings
 from resolve_path import resolve_path
 
 def create_pivot_table(dataframe, folder_path):

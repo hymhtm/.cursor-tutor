@@ -4,9 +4,13 @@ firstenv/
 ENV/
 .env/
 
-#エクセルファイル
+#excel file
 *.xlsx
 *.xls
+
+#csv file
+*.csv
+
 
 #ignore all log files
 *.log
@@ -40,5 +44,17 @@ __pycache__/
 #ignore ssh file
 .ssh/
 
+#ignore pyinstaller build file
+build/
+dist/
+*.toc
+*.pyz
+*.pkg
+*.exe
+*.html
 
+#ignore PIL cache file
+*.cache/
 
+#ignore virtualenv file
+.venv/

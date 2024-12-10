@@ -2,6 +2,12 @@ import base64
 from datetime import datetime, timedelta, timezone
 import os
 import requests
+try:
+    import pandas as pd
+except ImportError:
+    print("pandasのインストールが必要です。以下のコマンドを実行してください：")
+    print("pip install pandas")
+    raise
 
 import config.settings as settings
 
@@ -50,11 +56,11 @@ class Requestlogs(object):
                 #APIエンドポイント
                 url = self.base_condition_url.format(machine=machine, begin_datetime=begin_datetime, end_datetime=end_datetime)
                 #ユーザー名とパスワードをBASE64でエンコード
-                credentials = base64.base64encode(f"{self.username}:{self.password}".encode()).decode()
+                credentials = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
 
                 #header
                 headers = {
-                    "Content-type": "application.json",
+                    "Content-Type": "application/json",
                     "Authorization": f"Basic {credentials}"
                 }
 
@@ -103,13 +109,18 @@ class Requestlogs(object):
                 #モニタリンググループを繰り返し処理
                 for monitoring in monitorings:
                     #APIエンドポイント
-                    url = self.base_monitoring_url.format(machine=machine, monitoring=monitoring, begin_datetime=begin_datetime, end_datetime=end_datetime)
+                    url = self.base_monitoring_url.format(
+                        machine=machine, 
+                        monitoring=monitoring, 
+                        begin_datetime=begin_datetime, 
+                        end_datetime=end_datetime
+                    )
                     #ユーザー名とパスワードをbase64でエンコード
-                    credentials = base64.base64encode(f"{self.username}:{self.password}".encode()).decode()
+                    credentials = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
 
                     #header
                     headers = {
-                        "Content-type": "application.json",
+                        "Content-Type": "application/json",
                         "Authorization": f"Basic {credentials}"
                     }
 
@@ -140,28 +151,22 @@ class Requestlogs(object):
         return monitoring_log_list
     
     def save_logs(self, logs_list:list = None, specified_file_name:str=None, specified_folder_path:str=None):
-        #ログリストが指定されていない場合はエラーメッセージを送信
         if logs_list is None:
             raise ValueError("logs_list is None")
-        else:
-            default_file_name = f"logs_{self.begin_datetime.strftime('%Y-%m-%d')}.csv"
-            default_folder_path = "./logs"
-            file_name = specified_file_name if specified_file_name is not None else default_file_name
-            folder_path = specified_folder_path if specified_folder_path is not None else default_folder_path
-            file_path = os.path.join(folder_path, file_name)
-        logs_df = pl.DataFrame(logs_list)
-        logs_df.write_csv("monitoring_logs.csv")
         
-
-        response = requests.get(url, headers=headers)
-        if(response.status_code == 200):
-            monitoring_log_list.extend(response.json())
-        else:
-            print(f"error: {response.status_code}")
+        default_file_name = f"logs_{self.begin_datetime.strftime('%Y-%m-%d')}.csv"
+        default_folder_path = "./logs"
+        file_name = specified_file_name if specified_file_name is not None else default_file_name
+        folder_path = specified_folder_path if specified_folder_path is not None else default_folder_path
+        
+        # フォルダが存在しない場合は作成
+        os.makedirs(folder_path, exist_ok=True)
+        
+        file_path = os.path.join(folder_path, file_name)
+        logs_df = pd.DataFrame(logs_list)
+        logs_df.to_csv(file_path, index=False)
 
 if __name__ == "__main__":
     request_logs = Requestlogs()
     condition_logs_list = request_logs.request_condition_logs()
-    print(condition_logs_list)
-
-
+    request_logs.save_logs(condition_logs_list, specified_file_name=f"condition_logs_{datetime.now().strftime('%Y-%m-%d')}.csv")

@@ -1,5 +1,4 @@
 import os
-import time
 import xlrd
 
 import matplotlib.pyplot as plt
@@ -7,9 +6,9 @@ from matplotlib import rcParams
 import matplotlib.patches as mpatches
 import pandas as pd
 
-#folder_path = r"C:\Users\nakamura114\Desktop\Report"
+folder_path = r"C:\Users\nakamura114\Downloads\Report"
 #dir_list = ['LA', 'MC', 'G']
-folder_path = r"C:\Users\nakamura114\Downloads\drive-download-20240618T073919Z-001"
+#folder_path = r"C:\Users\nakamura114\Downloads\drive-download-20240618T073919Z-001"
 dir_path_list = []
 
 rcParams['font.family'] = 'MS Gothic'

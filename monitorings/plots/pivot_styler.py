@@ -7,6 +7,7 @@ from openpyxl.utils import get_column_letter
 import pandas as pd
 from config import settings
 from resolve_path import resolve_path
+
 def pivot_styler(xls_file_path):
     #ファイルパスと拡張子を確認
     path = resolve_path(xls_file_path)
@@ -58,3 +59,10 @@ def pivot_styler(xls_file_path):
         cell.number_format = 'm月d日'
 
     wb.save(abs_path)
+
+if __name__ == '__main__':
+    print("start")
+    start_time = time.time()
+    pivot_styler(r"C:\Users\nakamura114\Downloads\Report\Report\report_output_Nov\monthly_pivot_table.xlsx")
+    end_time = time.time()
+    print(f"end. time:{end_time - start_time}sec")

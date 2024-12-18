@@ -83,3 +83,7 @@ def plot_rate(folder_path):
             os.makedirs(save_dir)
         plt.savefig(os.path.join(save_dir, f'{date} - {name}.png'))
         plt.close()
+
+if __name__ == '__main__':
+    folder_path = r"C:\Users\nakamura114\Downloads\Report\Report\report_output_monthly"
+    plot_rate(folder_path)

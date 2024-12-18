@@ -3,6 +3,8 @@ import openpyxl
 from pandas import pivot_table
 from resolve_path import resolve_path
 
+import report_output_day_collector
+
 def create_pivot_table(dataframe, folder_path):
     path = resolve_path(folder_path)
     df = dataframe
@@ -18,3 +20,8 @@ def create_pivot_table(dataframe, folder_path):
     return_path = os.path.join(path, 'monthly_pivot_table.xlsx')
     pivot.to_excel(return_path, index=True)
     return return_path
+
+if __name__ == '__main__':
+    folder_path = r"C:\Users\nakamura114\Downloads\Report\Report\report_output_Nov"
+    df = report_output_day_collector.collect_xlsdata(folder_path)
+    create_pivot_table(df, folder_path)

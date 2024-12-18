@@ -1,0 +1,16 @@
+body {
+    background-color: #00005f;
+    margin: 3%;
+    padding: 3%;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.container h1 {
+    color: #00005f;
+}

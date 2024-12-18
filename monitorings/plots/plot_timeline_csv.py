@@ -9,18 +9,17 @@ import matplotlib.dates as mdates
 from matplotlib import rcParams
 import matplotlib.patches as mpatches
 import pandas as pd
-import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import Tk,filedialog, messagebox
 
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base_path, relative_path)
 
 # 色の設定 全グラフ共通
-settings_path = resource_path(os.path.join('monitorings', 'plots', 'config', 'settings.py'))
+settings_path = resource_path(os.path.join('config', 'settings.py'))
 spec = importlib.util.spec_from_file_location("settings", settings_path)
 settings = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(settings)
@@ -151,7 +150,7 @@ dir_path_list = []
 rcParams['font.family'] = 'MS Gothic'
 
 def main():
-    root = tk.Tk()
+    root = Tk()
     root.withdraw()
 
     while True:
@@ -182,6 +181,18 @@ def main():
         break
     root.destroy()
 
+def main():
+    chosed_file_path = r"C:\Users\nakamura114\Downloads\operation_result_20241211_095222.csv"
+    start_time = time.time()
+    folder_path = r'C:\Users\nakamura114\Downloads'
+    file_full_path = chosed_file_path
+    days = calculate_days(file_full_path)
+    for order_name, equipment_order in equipment_orders.items():
+        for day in range(days):
+            plot_day(day, equipment_order, order_name, file_full_path, folder_path)
+    end_time = time.time()
+    messagebox.showinfo("完了", f'実行時間: {end_time - start_time:.2f}秒\nグラフの保存先: {folder_path}')
+    
 if __name__ == '__main__':
     main()
     

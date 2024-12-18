@@ -36,10 +36,16 @@ def collect_xlsdata(folder_path):
     
         df['設備名'] = sheet.cell_value(0,3)
         
-        df['Timestamp'] = pd.to_datetime(file[-12:-4] + str(' 08:00:00'))
+        df['Timestamp'] = pd.to_datetime(sheet.cell_value(1,3)[0:10] + str(' 08:00:00'))
         df['Date'] =  df['Timestamp'].dt.date - timedelta(days=1)
         sec_dataframe = pd.concat([sec_dataframe, df], ignore_index=False)
     
     sec_dataframe.reindex(columns=['設備名', 'Timestamp','Date', '運転中', '停止中', 'アラーム中', '非常停止中', '手動運転中', '一時停止中', '切断中'])
     sec_dataframe.to_excel(os.path.join(folder_path, 'sec_data.xlsx'), index=True)
     return sec_dataframe
+
+if __name__ == '__main__':
+    print('start')
+    folder_path = r"C:\Users\nakamura114\Downloads\Report\Report\report_output_Nov"
+    collect_xlsdata(folder_path)
+    print('end')

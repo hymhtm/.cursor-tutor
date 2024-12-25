@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from dash import Dash, html, dcc, callback, Input, Output
+from dash import Dash, html, dcc, callback, callback_context, Input, Output
 import plotly.express as px
 import pandas as pd
 
@@ -8,16 +8,23 @@ from data_requests.request_logs import Requestlogs
 from data_requests.config import settings
 
 """
-dashの練習用にタイムライングラフ作成
+Plot timeline graph using dash
+    Args:
+        df (pd.DataFrame): dataframe
+        settings (settings): settings
 
     Returns:
         _type_: _description_
 """
 
+#apiのデータ取得
+logs = Requestlogs()
+logs.begin_datetime = datetime.now()-timedelta(days=1)
+logs.end_datetime = datetime.now()
+condition_data = logs.request_condition_logs()
+
 #dataframeの成型
-df = pd.read_csv('C:/Users/nakamura114/Downloads/operation_result_20241213_100616.csv')
-df['StartDateTime'] = pd.to_datetime(df['StartDateTime'])
-df['EndDateTime'] = pd.to_datetime(df['EndDateTime'])
+df = logs.format_logs(condition_data)
 
 #dataframeの期間算出
 begin_datetime = df['StartDateTime'].min()
@@ -31,18 +38,7 @@ end_unixtime = int(end_datetime.timestamp())
 current_time = datetime.now().strftime('%Y/%m/%d %H:%M')
 
 #表示カラーの設定
-colors = {
-    '運転中': 'green',
-    '停止中': 'yellow',
-    'アラーム中': 'red',
-    '非常停止中': 'darkred',
-    '一時停止中': 'orange',
-    '手動運転中': 'blue',
-    '切断中': 'gray',
-    '待機中': 'blue',
-    'Empty': 'lightgray'
-}
-
+colors = settings.color_dict
 #dashの初期化
 app = Dash(__name__)
 
@@ -59,7 +55,7 @@ app.layout = html.Div(
         ),
         dcc.RadioItems(
             id='division-picker',
-            options=,
+            options=[{'label': dep, 'value': dep} for dep in settings.department_dict.keys()],
             value='ALL',
             inline=True,
             style={'font-size': '16px'}
@@ -80,16 +76,21 @@ app.layout = html.Div(
 #コールバックの設定
 @callback(
     Output('timeline-graph', 'figure'),
+    Output('equipment-dropdown', 'options'),
     Input('equipment-dropdown', 'value'),
     Input('division-picker', 'value')
 )
+
+
+#部門別のグラフ更新
+def update_eqipments(selected_division):
+    equipments = settings.department_dict.get(selected_division)
+    return equipments
 
 #グラフの更新
 def update_graph(selected_equipments, selected_division):
     if selected_equipments is None:
         return {}
-    #start_time = datetime.fromtimestamp(selected_date_range[0])
-    #end_time = datetime.fromtimestamp(selected_date_range[1])
     else:
         filtered_df = df[
             df['EquipmentName'].isin(selected_equipments) 

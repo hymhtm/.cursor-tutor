@@ -18,18 +18,18 @@ class Requestlogs(object):
         #url
         self.base_condition_url = settings.base_condition_url
         self.base_monitoring_url = settings.base_monitoring_url
-        #認証情報
+        #authentication
         self.user_settings = settings.user_settings
         self.default_username = self.user_settings['username']
         self.default_password = self.user_settings['password']
-        #機器グループ&モニタリンググループ
+        #machine group & monitoring group
         self.default_machine_groups = settings.machine_groups
         self.default_monitorings = settings.monitorings
-        #データの取得期間
+        #data acquisition period
         self.default_begin_datetime = datetime.now()-timedelta(days=1)
         self.default_end_datetime = datetime.now()
 
-        #ユーザー指定の値
+        #user specified value
         self.username = username if username is not None else self.default_username
         self.password = password if password is not None else self.default_password
         self.machine_groups = machine_groups if machine_groups is not None else self.default_machine_groups
@@ -40,22 +40,22 @@ class Requestlogs(object):
 
 
     def request_condition_logs(self):
-        #機器情報
+        #machine information
         machine_groups = self.machine_groups
-        #データの取得期間
+        #data acquisition period
         begin_datetime = self.begin_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
         end_datetime = self.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
         my_timezone = self.my_timezone
 
-        #データを格納するリスト
+        #data storage list
         condition_logs_list = []
 
-        #機器情報とモニタリンググループを繰り返し処理
+        #machine information & monitoring group loop
         for group, machines in machine_groups.items():
             for machine in machines:
-                #APIエンドポイント
+                #API endpoint
                 url = self.base_condition_url.format(machine=machine, begin_datetime=begin_datetime, end_datetime=end_datetime)
-                #ユーザー名とパスワードをBASE64でエンコード
+                #user name & password encode
                 credentials = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
 
                 #header
@@ -64,17 +64,17 @@ class Requestlogs(object):
                     "Authorization": f"Basic {credentials}"
                 }
 
-                #APIエンドポイントにリクエストを送信
+                #send request to API endpoint
                 response = requests.get(url, headers=headers)
 
-                #ステータスコードが200の場合はデータを取得
+                #if status code is 200, get data
                 if response.status_code == 200:
                     data = response.json()
-                    #取得後のデータ処理
+                    #data processing after getting data
                     for item in data:
                         item['machine'] = machine
                         item['group'] = group
-                        #UTC時間をJST時間に変換
+                        #UTC time to JST time
                         if item["start"] is not None:
                             utc_starttime = datetime.strptime(item["start"], "%Y-%m-%dT%H:%M:%S.%fZ")
                             jst_starttime = utc_starttime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
@@ -83,7 +83,7 @@ class Requestlogs(object):
                             utc_endtime = datetime.strptime(item["end"], "%Y-%m-%dT%H:%M:%S.%fZ")
                             jst_endtime = utc_endtime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
                             item["end"] = jst_endtime.strftime("%Y-%m-%d %H:%M:%S.%fZ")
-                        #データをリストに格納
+                        #data storage
                         condition_logs_list.append(item)
                 else:
                     print(f"エラーが発生しました: {response.status_code}")
@@ -91,31 +91,31 @@ class Requestlogs(object):
         return condition_logs_list
 
     def request_monitoring_logs(self):
-        #機器情報
+        #machine information
         machine_groups = self.machine_groups
-        #モニタリンググループ
+        #monitoring group
         monitorings = self.monitorings
-        #データの取得期間
+        #data acquisition period
         begin_datetime = self.begin_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
         end_datetime = self.end_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
         my_timezone = self.my_timezone
 
-        #データを格納するリスト
+        #data storage list
         monitoring_log_list = []
 
-        #機器情報とモニタリンググループを繰り返し処理
+        #machine information & monitoring group loop
         for group, machines in machine_groups.items():
             for machine in machines:
-                #モニタリンググループを繰り返し処理
+                #monitoring group loop
                 for monitoring in monitorings:
-                    #APIエンドポイント
+                    #API endpoint
                     url = self.base_monitoring_url.format(
                         machine=machine, 
                         monitoring=monitoring, 
                         begin_datetime=begin_datetime, 
                         end_datetime=end_datetime
                     )
-                    #ユーザー名とパスワードをbase64でエンコード
+                    #user name & password encode
                     credentials = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
 
                     #header
@@ -124,17 +124,17 @@ class Requestlogs(object):
                         "Authorization": f"Basic {credentials}"
                     }
 
-                    #APIエンドポイントにリクエストを送信
+                    #send request to API endpoint
                     response = requests.get(url, headers=headers)
 
-                    #ステータスコードが200の場合はデータを取得
+                    #if status code is 200, get data
                     if response.status_code == 200:
                         data = response.json()
-                        #取得後のデータ処理
+                        #data processing after getting data
                         for item in data:
                             item['machine'] = machine
                             item['group'] = group
-                            #UTC時間をJST時間に変換
+                            #UTC time to JST time
                             if item["start"] is not None:
                                 utc_starttime = datetime.strptime(item["start"], "%Y-%m-%dT%H:%M:%S.%fZ")
                                 jst_starttime = utc_starttime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
@@ -143,7 +143,7 @@ class Requestlogs(object):
                                 utc_endtime = datetime.strptime(item["end"], "%Y-%m-%dT%H:%M:%S.%fZ")
                                 jst_endtime = utc_endtime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
                                 item["end"] = jst_endtime.strftime("%Y-%m-%d %H:%M:%S.%fZ")
-                            #データをリストに格納
+                            #data storage
                             monitoring_log_list.append(item)
                     else:
                         print(f"エラーが発生しました: {response.status_code}")
@@ -151,6 +151,20 @@ class Requestlogs(object):
         return monitoring_log_list
     
     def save_logs(self, logs_list:list = None, specified_file_name:str=None, specified_folder_path:str=None):
+        """
+        save logs_list to csv file
+
+        Args:
+            logs_list (list, optional): list of json data.
+            specified_file_name (str, optional): file name.
+            specified_folder_path (str, optional): folder path.
+        """
+        
+        
+        
+        
+        
+        
         if logs_list is None:
             raise ValueError("logs_list is None")
         
@@ -159,14 +173,31 @@ class Requestlogs(object):
         file_name = specified_file_name if specified_file_name is not None else default_file_name
         folder_path = specified_folder_path if specified_folder_path is not None else default_folder_path
         
-        # フォルダが存在しない場合は作成
+        #create folder if not exist
         os.makedirs(folder_path, exist_ok=True)
         
         file_path = os.path.join(folder_path, file_name)
         logs_df = pd.DataFrame(logs_list)
         logs_df.to_csv(file_path, index=False)
+    
+    def format_logs(self, logs_list:list = None):
+        """
+        format logs_list to dataframe
+
+        Args:
+            logs_list (list, optional): list of json data.
+
+        Returns:
+            logs_df: dataframe
+        """
+        logs_df = pd.DataFrame(logs_list)
+        logs_df.columns = ['row', 'StartDateTime', 'EndDateTime', 'Contents', 'EquipmentName', 'Group']
+        logs_df.set_index('row', inplace=True)
+        logs_df['StartDateTime'] = pd.to_datetime(logs_df['StartDateTime'])
+        logs_df['EndDateTime'] = pd.to_datetime(logs_df['EndDateTime'])
+        return logs_df
 
 if __name__ == "__main__":
-    request_logs = Requestlogs()
-    condition_logs_list = request_logs.request_condition_logs()
-    request_logs.save_logs(condition_logs_list, specified_file_name=f"condition_logs_{datetime.now().strftime('%Y-%m-%d')}.csv")
+     request_logs = Requestlogs()
+     condition_logs_list = request_logs.request_condition_logs()
+     request_logs.save_logs(condition_logs_list, specified_file_name=f"condition_logs_{datetime.now().strftime('%Y-%m-%d')}.csv")

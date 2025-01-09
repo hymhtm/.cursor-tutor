@@ -1,6 +1,5 @@
 #バーチャル環境
-venv/
-firstenv/
+.venv/
 ENV/
 .env/
 
@@ -58,6 +57,3 @@ dist/
 
 #ignore PIL cache file
 *.cache/
-
-#ignore virtualenv file
-.venv/

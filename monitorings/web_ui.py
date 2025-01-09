@@ -14,42 +14,23 @@ Plot timeline graph using dash
         settings (settings): settings
 
     Returns:
-        _type_: _description_
+        fig (plotly.graph_objects.Figure): graph
 """
 
-#apiのデータ取得
-logs = Requestlogs()
-logs.begin_datetime = datetime.now()-timedelta(days=1)
-logs.end_datetime = datetime.now()
-condition_data = logs.request_condition_logs()
-
-#dataframeの成型
-df = logs.format_logs(condition_data)
-
-#dataframeの期間算出
-begin_datetime = df['StartDateTime'].min()
-end_datetime = df['EndDateTime'].max()
-
-#unixtimeの取得
-begin_unixtime = int(begin_datetime.timestamp())
-end_unixtime = int(end_datetime.timestamp())
-
-#現在時刻の取得
-current_time = datetime.now().strftime('%Y/%m/%d %H:%M')
-
-#表示カラーの設定
-colors = settings.color_dict
-#dashの初期化
+#dash app initialization
 app = Dash(__name__)
 
-#レイアウトの設定
+#layout setting
 app.layout = html.Div(
     children=[
-        html.H3(children='中村製作所', style = {'textAlign': 'right','font-size': '11px'}),
+        html.H3(
+            children='中村製作所',
+            style = {'textAlign': 'right','font-size': '11px'}
+        ),
         html.Div(
             children=[
                 html.Div(children='稼働履歴',style={'font-size': '16px'}),
-                html.Div(children=f'{begin_datetime} ~ {end_datetime}',style={'font-size': '16px'})
+                html.Div(children=f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d")} ~ {datetime.now().strftime("%Y-%m-%d")}',style={'font-size': '16px'})
             ],
             style={'marginBottom': '20px'}
         ),
@@ -62,42 +43,58 @@ app.layout = html.Div(
         ),
         dcc.Dropdown(
             id='equipment-dropdown',
-            options=[{'label': equipment, 'value': equipment} for equipment in df['EquipmentName'].unique()],
-            value=df['EquipmentName'].unique(),
+            options=[{'label': equipment, 'value': equipment} for equipment in settings.department_dict['ALL']],
+            value=settings.department_dict['ALL'],
             multi=True,
             placeholder='機械を選択',
             clearable=True,
             searchable=True
         ),
-        dcc.Graph(id='timeline-graph',style={'width': '100%', 'height': '100vh'})
+        dcc.Graph(
+            id='timeline-graph',
+            style={'width': '100%', 'height': '100vh'}
+        ),
+        dcc.Interval(
+            id='interval-component',
+            interval=5*60*1000, #5minutes
+            n_intervals=0
+        )
     ]
 )
 
-#コールバックの設定
+#callback setting
 @callback(
-    Output('timeline-graph', 'figure'),
     Output('equipment-dropdown', 'options'),
-    Input('equipment-dropdown', 'value'),
     Input('division-picker', 'value')
 )
 
-
-#部門別のグラフ更新
-def update_eqipments(selected_division):
-    equipments = settings.department_dict.get(selected_division)
-    return equipments
-
-#グラフの更新
-def update_graph(selected_equipments, selected_division):
-    if selected_equipments is None:
-        return {}
+#select equipments by selected division
+def update_equipment_options(selected_division):
+    if selected_division:
+        selected_equipments = settings.department_dict[selected_division]
     else:
-        filtered_df = df[
-            df['EquipmentName'].isin(selected_equipments) 
-        ].copy()
-    fig = px.timeline(filtered_df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors)
+        selected_equipments = settings.department_dict['ALL']
+    return [{'label': equipment, 'value': equipment} for equipment in selected_equipments]
+
+@callback(
+    Output('timeline-graph', 'figure'),
+    Input('equipment-dropdown', 'value'),
+    Input('interval-component', 'n_intervals') #interval component is used to update graph on interval
+)
+
+#update graph on intervals
+def update_graph(selected_equipments, n_intervals):
+    if not selected_equipments:
+        selected_equipments = settings.department_dict['ALL']
+    requestlogs = Requestlogs(machine_groups={'ALL': selected_equipments})
+    conditionlogs = requestlogs.request_condition_logs()
+    df = requestlogs.format_logs(conditionlogs)
+    
+    colors = settings.color_dict
+    fig = px.timeline(df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors)
+    fig.update_layout(title='稼働履歴', xaxis_title='時間', yaxis_title='機械名', legend_title='稼働内容')
     return fig
 
-#アプリの実行
+#app execution
 if __name__ == '__main__':
     app.run_server(debug=True)

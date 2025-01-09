@@ -90,6 +90,7 @@ class Requestlogs(object):
 
         return condition_logs_list
 
+
     def request_monitoring_logs(self):
         #machine information
         machine_groups = self.machine_groups
@@ -149,21 +150,34 @@ class Requestlogs(object):
                         print(f"エラーが発生しました: {response.status_code}")
 
         return monitoring_log_list
+
     
-    def save_logs(self, logs_list:list = None, specified_file_name:str=None, specified_folder_path:str=None):
+    def format_logs(self, logs_list:list = None):
         """
-        save logs_list to csv file
+        format logs_list to dataframe
 
         Args:
             logs_list (list, optional): list of json data.
+
+        Returns:
+            logs_df: dataframe
+        """
+        logs_df = pd.DataFrame(logs_list)
+        logs_df.columns = ['StartDateTime', 'EndDateTime', 'Contents', 'EquipmentName', 'Group']
+        logs_df['StartDateTime'] = pd.to_datetime(logs_df['StartDateTime'])
+        logs_df['EndDateTime'] = pd.to_datetime(logs_df['EndDateTime'])
+        return logs_df
+
+    
+    def save_logs(self, logs_list:list, specified_file_name:str=None, specified_folder_path:str=None):
+        """
+        save logs_list as a csv file
+
+        Args:
+            logs_list (list): list of json data.
             specified_file_name (str, optional): file name.
             specified_folder_path (str, optional): folder path.
         """
-        
-        
-        
-        
-        
         
         if logs_list is None:
             raise ValueError("logs_list is None")
@@ -179,23 +193,7 @@ class Requestlogs(object):
         file_path = os.path.join(folder_path, file_name)
         logs_df = pd.DataFrame(logs_list)
         logs_df.to_csv(file_path, index=False)
-    
-    def format_logs(self, logs_list:list = None):
-        """
-        format logs_list to dataframe
 
-        Args:
-            logs_list (list, optional): list of json data.
-
-        Returns:
-            logs_df: dataframe
-        """
-        logs_df = pd.DataFrame(logs_list)
-        logs_df.columns = ['row', 'StartDateTime', 'EndDateTime', 'Contents', 'EquipmentName', 'Group']
-        logs_df.set_index('row', inplace=True)
-        logs_df['StartDateTime'] = pd.to_datetime(logs_df['StartDateTime'])
-        logs_df['EndDateTime'] = pd.to_datetime(logs_df['EndDateTime'])
-        return logs_df
 
 if __name__ == "__main__":
      request_logs = Requestlogs()

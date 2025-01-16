@@ -85,5 +85,5 @@ def plot_rate(folder_path):
         plt.close()
 
 if __name__ == '__main__':
-    folder_path = r"C:\Users\nakamura114\Downloads\Report\Report\report_output_monthly"
+    folder_path = r"C:\Users\nakamura114\Downloads\Report_Dec-20250115T032018Z-001\Report_Dec"
     plot_rate(folder_path)

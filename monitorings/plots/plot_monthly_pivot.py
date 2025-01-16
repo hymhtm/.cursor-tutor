@@ -22,6 +22,6 @@ def create_pivot_table(dataframe, folder_path):
     return return_path
 
 if __name__ == '__main__':
-    folder_path = r"C:\Users\nakamura114\Downloads\Report\Report\report_output_Nov"
+    folder_path = r"C:\Users\nakamura114\Downloads\Report_Dec-20250115T032018Z-001\Report_Dec"
     df = report_output_day_collector.collect_xlsdata(folder_path)
     create_pivot_table(df, folder_path)

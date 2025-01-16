@@ -36,15 +36,15 @@ department_dict = {
 }
 
 color_dict = {
-    '運転中': 'green',
-    '停止中': 'yellow',
-    'アラーム中': 'red',
-    '非常停止中': 'darkred',
-    '一時停止中': 'orange',
-    '手動運転中': 'blue',
-    '切断中': 'gray',
-    '待機中': 'blue',
-    'Empty': 'lightgray'
+    'OPERATE': 'green',
+    'STOP': 'yellow',
+    'ALARM': 'red',
+    'EMERGENCY': 'darkred',
+    'SUSPENDED': 'orange',
+    'MANUAL': 'blue',
+    'DISCONNECT': 'gray',
+    'WARMUP': 'blue',
+    'WARNING': 'lightgray'
 }
 
 user_settings = {

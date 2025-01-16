@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from dash import Dash, html, dcc, callback, callback_context, Input, Output
+from dash import Dash, html, dcc, callback, Input, Output
 import plotly.express as px
 import pandas as pd
-
 from data_requests.request_logs import Requestlogs
 from data_requests.config import settings
+from dash_logging import logger
 
 """
 Plot timeline graph using dash
@@ -30,7 +30,7 @@ app.layout = html.Div(
         html.Div(
             children=[
                 html.Div(children='稼働履歴',style={'font-size': '16px'}),
-                html.Div(children=f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d")} ~ {datetime.now().strftime("%Y-%m-%d")}',style={'font-size': '16px'})
+                html.Div(children=f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M")} ~ {datetime.now().strftime("%Y-%m-%d %H:%M")}',style={'font-size': '16px'})
             ],
             style={'marginBottom': '20px'}
         ),
@@ -72,8 +72,10 @@ app.layout = html.Div(
 def update_equipment_options(selected_division):
     if selected_division:
         selected_equipments = settings.department_dict[selected_division]
+        logger.debug(f'{selected_division}を選択, 設備：{selected_equipments}')
     else:
         selected_equipments = settings.department_dict['ALL']
+        logger.debug(f'部門が選択されていません。すべての設備を使用します。')
     return [{'label': equipment, 'value': equipment} for equipment in selected_equipments]
 
 @callback(
@@ -86,13 +88,29 @@ def update_equipment_options(selected_division):
 def update_graph(selected_equipments, n_intervals):
     if not selected_equipments:
         selected_equipments = settings.department_dict['ALL']
+        logger.debug(f'設備が選択されていません。すべての設備を使用します。')
+    
     requestlogs = Requestlogs(machine_groups={'ALL': selected_equipments})
     conditionlogs = requestlogs.request_condition_logs()
     df = requestlogs.format_logs(conditionlogs)
     
+    begin_datetime = datetime.now(timezone(timedelta(hours=+9))) - timedelta(days=1)
+    
+    df_list = []
+    
+    for equipment_name, group_df in df.groupby('EquipmentName'):
+        
+        group_df = group_df.sort_values(by='StartDateTime')
+        
+        if not group_df.empty and group_df.iloc[0]['StartDateTime'] < begin_datetime:
+            group_df.at[0, 'StartDateTime'] = begin_datetime
+        df_list.append(group_df)
+        
+        df_clipped = pd.concat(df_list, ignore_index=True)
+        
     colors = settings.color_dict
     fig = px.timeline(df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors)
-    fig.update_layout(title='稼働履歴', xaxis_title='時間', yaxis_title='機械名', legend_title='稼働内容')
+    fig.update_layout(title='稼働履歴', xaxis_title='時間', yaxis_title='機械名', legend_title='稼働内容', xaxis_range=[begin_datetime, datetime.now()])
     return fig
 
 #app execution

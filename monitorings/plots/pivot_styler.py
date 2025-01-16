@@ -63,6 +63,6 @@ def pivot_styler(xls_file_path):
 if __name__ == '__main__':
     print("start")
     start_time = time.time()
-    pivot_styler(r"C:\Users\nakamura114\Downloads\Report\Report\report_output_Nov\monthly_pivot_table.xlsx")
+    pivot_styler(r"C:\Users\nakamura114\Downloads\Report_Dec-20250115T032018Z-001\Report_Dec\monthly_pivot_table.xlsx")
     end_time = time.time()
     print(f"end. time:{end_time - start_time}sec")

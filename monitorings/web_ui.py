@@ -105,10 +105,8 @@ def update_graph(selected_equipments, n_intervals):
     for equipment_name, group_df in df.groupby('EquipmentName'):
         
         group_df = group_df.sort_values(by='StartDateTime')
-        #print(group_df.iloc[0]['EquipmentName'], group_df.iloc[0]['StartDateTime'])
         if not group_df.empty and group_df.iloc[0]['StartDateTime'] <= begin_datetime:
             group_df.at[0, 'StartDateTime'] = begin_datetime
-            #print(f'updated_value: {group_df.iloc[0]["StartDateTime"]}')
         df_list.append(group_df)
         
         df_clipped = pd.concat(df_list, ignore_index=True)

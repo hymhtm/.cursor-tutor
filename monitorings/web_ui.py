@@ -65,7 +65,8 @@ app.layout = html.Div(
 #callback setting
 @callback(
     Output('equipment-dropdown', 'options'),
-    Input('division-picker', 'value')
+    Output('equipment-dropdown', 'value'),
+    Input('division-picker', 'value'),
 )
 
 #select equipments by selected division
@@ -76,7 +77,7 @@ def update_equipment_options(selected_division):
     else:
         selected_equipments = settings.department_dict['ALL']
         logger.debug(f'部門が選択されていません。すべての設備を使用します。')
-    return [{'label': equipment, 'value': equipment} for equipment in selected_equipments]
+    return selected_equipments, selected_equipments
 
 @callback(
     Output('timeline-graph', 'figure'),
@@ -86,6 +87,7 @@ def update_equipment_options(selected_division):
 
 #update graph on intervals
 def update_graph(selected_equipments, n_intervals):
+    print(datetime.now())
     if not selected_equipments:
         selected_equipments = settings.department_dict['ALL']
         logger.debug(f'設備が選択されていません。すべての設備を使用します。')

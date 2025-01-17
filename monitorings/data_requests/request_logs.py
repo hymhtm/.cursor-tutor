@@ -9,7 +9,7 @@ except ImportError:
     print("pip install pandas")
     raise
 
-from data_requests.config import settings
+from config import settings
 
 class Requestlogs(object):
     

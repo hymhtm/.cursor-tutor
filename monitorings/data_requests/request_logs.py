@@ -2,14 +2,12 @@ import base64
 from datetime import datetime, timedelta, timezone
 import os
 import requests
-try:
-    import pandas as pd
-except ImportError:
-    print("pandasのインストールが必要です。以下のコマンドを実行してください：")
-    print("pip install pandas")
-    raise
 
-from data_requests.config import settings
+import pandas as pd
+try:
+    from data_requests.config import settings
+except ImportError:
+    from config import settings
 
 class Requestlogs(object):
     
@@ -198,4 +196,4 @@ class Requestlogs(object):
 if __name__ == "__main__":
      request_logs = Requestlogs()
      condition_logs_list = request_logs.request_condition_logs()
-     request_logs.save_logs(condition_logs_list, specified_file_name=f"condition_logs_{datetime.now().strftime('%Y-%m-%d')}.csv")
+     request_logs.save_logs(condition_logs_list, specified_file_name=f"condition_logs_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv")

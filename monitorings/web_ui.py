@@ -28,6 +28,7 @@ app.layout = html.Div(
             style = {'textAlign': 'right','font-size': '11px'}
         ),
         html.Div(
+            id='title-and-time-display',
             children=[
                 html.Div(children='稼働履歴',style={'font-size': '16px'}),
                 html.Div(children=f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M")} ~ {datetime.now().strftime("%Y-%m-%d %H:%M")}',style={'font-size': '16px'})
@@ -81,8 +82,9 @@ def update_equipment_options(selected_division):
 
 @callback(
     Output('timeline-graph', 'figure'),
+    Output('title-and-time-display', 'children'),
     Input('equipment-dropdown', 'value'),
-    Input('interval-component', 'n_intervals') #interval component is used to update graph on interval
+    Input('interval-component', 'n_intervals'), #interval component is used to update graph on interval
 )
 
 #update graph on intervals
@@ -103,17 +105,20 @@ def update_graph(selected_equipments, n_intervals):
     for equipment_name, group_df in df.groupby('EquipmentName'):
         
         group_df = group_df.sort_values(by='StartDateTime')
-        
-        if not group_df.empty and group_df.iloc[0]['StartDateTime'] < begin_datetime:
+        #print(group_df.iloc[0]['EquipmentName'], group_df.iloc[0]['StartDateTime'])
+        if not group_df.empty and group_df.iloc[0]['StartDateTime'] <= begin_datetime:
             group_df.at[0, 'StartDateTime'] = begin_datetime
+            #print(f'updated_value: {group_df.iloc[0]["StartDateTime"]}')
         df_list.append(group_df)
         
         df_clipped = pd.concat(df_list, ignore_index=True)
-        
+    print(df['EquipmentName'].unique())
     colors = settings.color_dict
     fig = px.timeline(df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors)
     fig.update_layout(title='稼働履歴', xaxis_title='時間', yaxis_title='機械名', legend_title='稼働内容', xaxis_range=[begin_datetime, datetime.now()])
-    return fig
+    
+    current_time_display = f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M")} ~ {datetime.now().strftime("%Y-%m-%d %H:%M")}'
+    return fig, current_time_display
 
 #app execution
 if __name__ == '__main__':

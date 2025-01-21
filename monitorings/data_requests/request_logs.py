@@ -24,8 +24,8 @@ class Requestlogs(object):
         self.default_machine_groups = settings.machine_groups
         self.default_monitorings = settings.monitorings
         #data acquisition period
-        self.default_begin_datetime = datetime.now()-timedelta(days=1)
-        self.default_end_datetime = datetime.now()
+        self.default_begin_datetime = datetime.now(timezone.utc)-timedelta(days=1)
+        self.default_end_datetime = datetime.now(timezone.utc)
 
         #user specified value
         self.username = username if username is not None else self.default_username
@@ -77,10 +77,13 @@ class Requestlogs(object):
                             utc_starttime = datetime.strptime(item["start"], "%Y-%m-%dT%H:%M:%S.%fZ")
                             jst_starttime = utc_starttime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
                             item['start'] = jst_starttime.strftime("%Y-%m-%d %H:%M:%S.%fZ")
+                            
                         if item["end"] is not None:
                             utc_endtime = datetime.strptime(item["end"], "%Y-%m-%dT%H:%M:%S.%fZ")
                             jst_endtime = utc_endtime.replace(tzinfo=timezone.utc).astimezone(my_timezone)
                             item["end"] = jst_endtime.strftime("%Y-%m-%d %H:%M:%S.%fZ")
+                        elif item["end"] is None:
+                            item["end"] = datetime.now(my_timezone).strftime("%Y-%m-%d %H:%M:%S.%fZ")
                         #data storage
                         condition_logs_list.append(item)
                 else:

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from dash import Dash, html, dcc, callback, Input, Output
+from flask_caching import Cache
 import plotly.express as px
 import pandas as pd
 from data_requests.request_logs import Requestlogs
@@ -20,6 +21,12 @@ Plot timeline graph using dash
 #dash app initialization
 app = Dash(__name__)
 
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'simple',
+    'CACHE_DEFAULT_TIMEOUT': 300
+})
+
+
 #layout setting
 app.layout = html.Div(
     children=[
@@ -30,7 +37,6 @@ app.layout = html.Div(
         html.Div(
             id='title-and-time-display',
             children=[
-                html.Div(children='稼働履歴',style={'font-size': '16px'}),
                 html.Div(children=f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M")} ~ {datetime.now().strftime("%Y-%m-%d %H:%M")}',style={'font-size': '16px'})
             ],
             style={'marginBottom': '20px'}
@@ -88,6 +94,7 @@ def update_equipment_options(selected_division):
 )
 
 #update graph on intervals
+@cache.memoize()
 def update_graph(selected_equipments, n_intervals):
     print(datetime.now())
     if not selected_equipments:
@@ -110,14 +117,15 @@ def update_graph(selected_equipments, n_intervals):
         df_list.append(group_df)
         
         df_clipped = pd.concat(df_list, ignore_index=True)
-    print(df['EquipmentName'].unique())
+
+        
     colors = settings.color_dict
-    fig = px.timeline(df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors)
-    fig.update_layout(title='稼働履歴', xaxis_title='時間', yaxis_title='機械名', legend_title='稼働内容', xaxis_range=[begin_datetime, datetime.now()])
+    fig = px.timeline(df, x_start='StartDateTime', x_end='EndDateTime', y='EquipmentName', color='Contents', color_discrete_map=colors, hover_name='Contents', hover_data=['StartDateTime', 'EndDateTime'])
+    fig.update_layout(xaxis_title='時間', yaxis_title='機械', xaxis_range=[begin_datetime, datetime.now()])
     
     current_time_display = f'{(datetime.now()-timedelta(days=1)).strftime("%Y-%m-%d %H:%M")} ~ {datetime.now().strftime("%Y-%m-%d %H:%M")}'
     return fig, current_time_display
 
 #app execution
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', port=8050, debug=False)

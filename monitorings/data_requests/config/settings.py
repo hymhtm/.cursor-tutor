@@ -29,9 +29,9 @@ equipments_G = [
 ]
 
 department_dict = {
-    'LA': equipments_LA,
-    'MC': equipments_MC,
-    'G': equipments_G,
+    '旋盤': equipments_LA,
+    'マシニング': equipments_MC,
+    '研磨': equipments_G,
     'ALL': equipments_LA + equipments_MC + equipments_G
 }
 
@@ -47,6 +47,17 @@ color_dict = {
     'WARNING': 'lightgray'
 }
 
+translate_dict = {
+    'OPERATE': '運転',
+    'STOP': '停止',
+    'ALARM': 'アラーム',
+    'EMERGENCY': '緊急停止',
+    'SUSPENDED': '休止',
+    'MANUAL': '手動',
+    'DISCONNECT': '切断',
+    'WARMUP': '暖機運転',
+    'WARNING': '警告'
+}
 user_settings = {
     'username': 'User0001',
     'password': '',
